@@ -149,6 +149,14 @@ class: center, middle, inverse
 # What is really wrong with GHC's exceptions?
 ### &nbsp;
 
+---
+## What is wrong with exceptions?
+## What is wrong with dynamically-typed exceptions?
+## What is really wrong with GHC's exceptions?
+
+---
+# What is wrong with exceptions?
+### &nbsp;
 
 ---
 layout: false
@@ -164,6 +172,8 @@ layout: false
 
  * What type of exception?
 
+ * How can I catch it?
+
 ---
 ## How to deal with it?
 
@@ -171,25 +181,89 @@ layout: false
 
  * Always derive show instances for custom exceptions
 
- * For rendering exceptions in a human-friendly manner implement
- `displayException` (inroduced with `base-4.8.0.0` / GHC 7.10.1)
-
  * GHC 7.10.2 to the rescue!
 
  * Don't use exceptions
 
 ---
-## An Extensible Dynamically-Typed Hierarchy of Exceptions*
+template: inverse
 
-Exceptions are organized as a tree ([An Extensible Dynamically-Typed Hierarchy
-of Exceptions]() by Simon Marlow), but:
+# What is wrong with dynamically-typed exceptions?
+### &nbsp;
+
+---
+## Exceptions are organized as a tree
+
+```
+                           SomeException
+                                 │
+      ┌─────────────────┬────────┴────────┬─────────────────┐
+      │                 │                 │                 │
+ArithException       ErrorCall    SomeAsyncException       ...
+                                          │
+                                          ├─────────────────┐
+                                          │                 │
+                                    AsyncException         ...
+```
+
+(see Simon Marlow's paper *An Extensible Dynamically-Typed Hierarchy
+of Exceptions*)
+---
+## Subtyping is modeled through nesting of constructors
+
+```
+                          SomeException
+                                │
+                                │
+                               Foo
+                                │
+      ┌─────────────────────────┼─────────────────────────┐
+      │                         │                         │
+     Baz                       Bar                       ...
+```
+```haskell
+data SomeException = forall e. … => SomeException e
+data Foo = forall e. … => Foo e
+data Bar = Bar
+data Baz = Baz
+```
+```
+throw Bar --> SomeException (Foo Bar)
+```
+---
+## Catching exceptions
+
+```
+action `catch` \(e :: SomeException) -> …
+action `catch` \(e :: Foo) -> …
+action `catch` \(e :: Bar) -> …
+```
+
+---
+## Questions
 
  * Looking at the type of an exception, can you tell where it sits in the
    hierarchy?
 
  * Can you extend the tree at arbitrary leave nodes?
 
+Sometimes it's desirable to catch almost all exceptions (catch everything but `AssertionFailed` and `AsyncException`):
+
  * How can you catch all exceptions except `AsyncException`?
+
+ * How can you catch all exceptions except both `AssertionFailed` and `AsyncException`?
+---
+## What is wrong with dynamically-typed exceptions?
+
+ * Looking at the type of a specific exception does not tell you where it sits
+    in the tree
+
+ * Having a value of `SomeException`, you can't get it's type (only unwrapping the first
+    level is possible)
+
+ * Users can't extend the tree at leaves
+
+ * `AsyncException` and `AssertionFailed` sit in the same subtree as other exceptions (see Michael Snoyman's [*Catching all exceptions*](https://www.fpcomplete.com/user/snoyberg/general-haskell/exceptions/catching-all-exceptions) for a workaround)
 
 ---
 template: inverse
@@ -210,32 +284,45 @@ main = do
   return $!! 'a' : throw (ErrorCall "foo")
   throwIO (ErrorCall "bar")
 ```
-
 ---
 ## What is really wrong with GHC's exceptions?
 
-- Avoid pure exceptions when ever possible
+- `seq` does not give you ordering guarantees for exceptions
+
+- Pattern matching does not give you ordering guarantees for exceptions
+
+⇒ `evaluate` is not equivalent to `(return $!)`
+---
+## How to deal with it?
 
 - Use `throwIO` instead of `throw`
 
-- Pattern matching is not a sane way to force exceptions (use `evaluate` from `Control.Exceptions`)
+- Avoid pure exceptions when ever possible
+
+- Always use `evaluate` from `Control.Exceptions` to force exceptions
 
 ---
-## Recap: What is wrong with exceptions?
+template: inverse
+
+# Recap
+
+### &nbsp;
+---
+## What is really, really wrong with exceptions?
 
  1. No location information
 
- 2. Having `SomeException`, you can't get it's type (only unwrapping the first
-    level is possible)
-
- 3. Looking at the type of a specific exception does not tell you where it sits
+ 1. Looking at the type of a specific exception does not tell you where it sits
     in the tree
 
- 4. Users can't extend the tree at leaves
+ 1. Having a value of `SomeException`, you can't get it's type (only unwrapping the first
+    level is possible)
 
- 5. `AsyncException`s sit in the same subtree as other exceptions
+ 1. Users can't extend the tree at leaves
 
- 6. Pattern matching does not force exceptions in a sane way
+ 1. `AsyncException` and `AssertionFailed` sit in the same subtree as other exceptions
+
+ 1. Pattern matching and `seq` do not give you ordering guarantees for exceptions
 
 ---
 template: inverse
