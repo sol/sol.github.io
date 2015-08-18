@@ -138,15 +138,15 @@ class: center, middle, inverse
 ### .right[by Simon Hengel]
 
 ---
-# What is wrong with exceptions?
+# 1. What is wrong with exceptions?
 ### &nbsp;
 
 ---
-# What is wrong with dynamically-typed exceptions?
+# 2. What is wrong with dynamically-typed exceptions?
 ### &nbsp;
 
 ---
-# What is really wrong with GHC's exceptions?
+# 3. What is really wrong with GHC's exceptions?
 ### &nbsp;
 
 ---
@@ -155,7 +155,7 @@ class: center, middle, inverse
 ## 3. What is really wrong with GHC's exceptions?
 
 ---
-# What is wrong with exceptions?
+# 1. What is wrong with exceptions?
 ### &nbsp;
 
 ---
@@ -177,18 +177,18 @@ layout: false
 ---
 ## How to deal with it?
 
- * Use `grep` (on your code, and your transitive dependencies)
+ * Don't use exceptions
 
- * Always derive show instances for custom exceptions
+ * Use `grep` (on your code, and *all* transitive dependencies)
+
+ * If you define your own exception *always* derive `Show`
 
  * GHC 7.10.2 to the rescue!
-
- * Don't use exceptions
 
 ---
 template: inverse
 
-# What is wrong with dynamically-typed exceptions?
+# 2. What is wrong with dynamically-typed exceptions?
 ### &nbsp;
 
 ---
@@ -205,6 +205,7 @@ ArithException       ErrorCall    SomeAsyncException       ...
                                           │                 │
                                     AsyncException         ...
 ```
+*An Extensible Dynamically-Typed Hierarchy of Exceptions* by Simon Marlow
 ---
 ## Subtyping is modeled through nesting of constructors
 
@@ -232,7 +233,9 @@ throw Bar --> SomeException (Foo Bar)
 
 ```
 action `catch` \(e :: SomeException) -> …
+
 action `catch` \(e :: Foo) -> …
+
 action `catch` \(e :: Bar) -> …
 ```
 
@@ -248,7 +251,7 @@ Sometimes it's desirable to catch almost all exceptions (catch everything but `A
 
  * How can you catch all exceptions except `AsyncException`?
 
- * How can you catch all exceptions except both `AssertionFailed` and `AsyncException`?
+ * How about both `AssertionFailed` and `AsyncException`?
 ---
 ## What is wrong with dynamically-typed exceptions?
 
@@ -265,7 +268,7 @@ Sometimes it's desirable to catch almost all exceptions (catch everything but `A
 ---
 template: inverse
 
-# Ok, but what is really wrong with GHC's exceptions?
+# 3. Ok, but what is really wrong with GHC's exceptions?
 ### &nbsp;
 
 
@@ -327,6 +330,7 @@ template: inverse
 # Recap
 
 ### &nbsp;
+
 ---
 ## What is really, really wrong with exceptions?
 
