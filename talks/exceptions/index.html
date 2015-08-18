@@ -150,9 +150,9 @@ class: center, middle, inverse
 ### &nbsp;
 
 ---
-## What is wrong with exceptions?
-## What is wrong with dynamically-typed exceptions?
-## What is really wrong with GHC's exceptions?
+## 1. What is wrong with exceptions?
+## 2. What is wrong with dynamically-typed exceptions?
+## 3. What is really wrong with GHC's exceptions?
 
 ---
 # What is wrong with exceptions?
@@ -205,9 +205,6 @@ ArithException       ErrorCall    SomeAsyncException       ...
                                           │                 │
                                     AsyncException         ...
 ```
-
-(see Simon Marlow's paper *An Extensible Dynamically-Typed Hierarchy
-of Exceptions*)
 ---
 ## Subtyping is modeled through nesting of constructors
 
@@ -273,7 +270,30 @@ template: inverse
 
 
 ---
-## What is really wrong with GHC's exceptions?
+## Which exception is thrown by this code?
+
+```haskell
+f :: Bool -> String
+f x = case x of
+  True -> error "foo"
+  False -> error "bar"
+
+main :: IO ()
+main = putStrLn (f False)
+```
+---
+## It depends!
+
+In cases like this, which exception is thrown may depend on:
+
+* GHC version
+
+* Optimization level
+
+Pattern matching does not give you exception ordering!
+
+---
+## Which exception is thrown by this code?
 
 ```haskell
 import Control.Exception
@@ -325,6 +345,21 @@ template: inverse
  1. Pattern matching and `seq` do not give you ordering guarantees for exceptions
 
 ---
+## References
+
+* [*An Extensible Dynamically-Typed Hierarchy of Exceptions*](http://community.haskell.org/~simonmar/papers/ext-exceptions.pdf), by Simon Marlow, in Haskell '06.
+
+* [*A semantics for imprecise exceptions*](http://research.microsoft.com/en-us/um/people/simonpj/Papers/imprecise-exn.htm), by Simon Peyton Jones, Alastair Reid, Tony Hoare, Simon Marlow, Fergus Henderson, in PLDI'99.
+
+* [Discussion on GHC issue #1171](https://ghc.haskell.org/trac/ghc/ticket/1171) (GHC doesn't respect the imprecise exceptions semantics)
+
+* [Discussion on GHC issue #2273](https://ghc.haskell.org/trac/ghc/ticket/2273) (inlining defeats seq)
+
+* [Discussion on GHC issue #5129](https://ghc.haskell.org/trac/ghc/ticket/5129) ("evaluate" optimized away)
+
+* [Discussion on GHC issue #5561](https://ghc.haskell.org/trac/ghc/ticket/5561) (assertion overriden by other exceptions)
+
+---
 template: inverse
 
 # About [me](http://typeful.net)
@@ -333,8 +368,6 @@ template: inverse
 ## [solirc_](https://twitter.com/solirc_) on Twitter
 ## work at [ZALORA](http://www.zalora.com/) (we are hiring)
 ## &nbsp;
-
-<!--span style="color:green">Agile:</span> You get results early and you can always change your mind-->
 
 <!--span style="color:red">Classic:</span> Software projects tend to be late and over budget-->
     </textarea>
