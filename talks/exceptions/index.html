@@ -316,6 +316,28 @@ main = do
   return $!! 'a' : throw (ErrorCall "foo")
   throwIO (ErrorCall "bar")
 ```
+
+```
+$ ghc --version
+The Glorious Glasgow Haskell Compilation System, version 7.6.3
+$ ghc -O2 Main.hs
+$ ./Main
+Main: bar
+```
+
+---
+## A "correct" version
+
+```haskell
+import Control.Exception
+import Control.DeepSeq
+
+main :: IO ()
+main = do
+  (evaluate . force) $ 'a' : throw (ErrorCall "foo")
+  throwIO (ErrorCall "bar")
+```
+
 ---
 ## What is really wrong with GHC's exceptions?
 
