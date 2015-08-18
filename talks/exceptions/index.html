@@ -263,7 +263,16 @@ Sometimes it's desirable to catch almost all exceptions (catch everything but `A
 
  * Users can't extend the tree at leaves
 
- * `AsyncException` and `AssertionFailed` sit in the same subtree as other exceptions (see Michael Snoyman's [*Catching all exceptions*](https://www.fpcomplete.com/user/snoyberg/general-haskell/exceptions/catching-all-exceptions) for a workaround)
+ * `AsyncException` and `AssertionFailed` sit in the same subtree as other exceptions
+
+---
+## How to deal with it?
+
+ * Don't use exceptions!
+
+ * When defining your own exceptions, keep the exception hierarchy flat
+
+ * Use `enclosed-exceptions` package (see Michael Snoyman's blog post [*Catching all exceptions*](https://www.fpcomplete.com/user/snoyberg/general-haskell/exceptions/catching-all-exceptions))
 
 ---
 template: inverse
@@ -318,9 +327,9 @@ main = do
 ---
 ## How to deal with it?
 
-- Use `throwIO` instead of `throw`
+- Avoid exceptions in pure code when ever possible
 
-- Avoid pure exceptions when ever possible
+- Use `throwIO` instead of `throw`
 
 - Always use `evaluate` from `Control.Exceptions` to force exceptions
 
