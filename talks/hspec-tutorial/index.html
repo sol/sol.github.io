@@ -1,0 +1,676 @@
+<!--
+Google IO 2012 HTML5 Slide Template
+
+Authors: Eric Bidelman <ebidel@gmail.com>
+         Luke Mahe <lukem@google.com>
+
+URL: https://code.google.com/p/io-2012-slides
+-->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Hspec</title>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <!--<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">-->
+  <!--<meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+  <!--This one seems to work all the time, but really small on ipad-->
+  <!--<meta name="viewport" content="initial-scale=0.4">-->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="stylesheet" media="all" href="theme/css/default.css">
+  <link rel="stylesheet" media="all" href="theme/css/app.css">
+  <link rel="stylesheet" media="only screen and (max-device-width: 480px)" href="theme/css/phone.css">
+  <base target="_blank"> <!-- This amazingness opens all links in a new tab. -->
+  <script data-main="js/slides" src="js/require-1.0.8.min.js"></script>
+</head>
+<body style="opacity: 0">
+
+<slides class="layout-widescreen">
+
+<!-- <slide class="logoslide nobackground">
+  <article class="flexbox vcenter">
+    <span><img src="images/google_developers_logo.png"></span>
+  </article>
+</slide>
+ -->
+<slide class="title-slide segue nobackground">
+  <aside class="gdbar"><img src="images/google_developers_icon_128.png"></aside>
+  <!-- The content of this hgroup is replaced programmatically through the slide_config.json. -->
+  <hgroup class="auto-fadein">
+    <h1 data-config-title><!-- populated from slide_config.json --></h1>
+    <h2 data-config-subtitle><!-- populated from slide_config.json --></h2>
+    <p data-config-presenter><!-- populated from slide_config.json --></p>
+  </hgroup>
+</slide>
+
+
+<slide  >
+  
+    <hgroup>
+      <h2>Agenda</h2>
+      <h3></h3>
+    </hgroup>
+    <article ><ul>
+<li>An overview of Hspec</li>
+<li>A brief introduction to QuickCheck</li>
+<li>Extended example</li>
+<li>Automatic spec discovery</li>
+<li>Exercises</li>
+</ul></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>What is Hspec</h2>
+      <h3></h3>
+    </hgroup>
+    <article ><p>Hspec is a testing framework for Haskell.  It is heavily inspired by the Ruby
+library RSpec.</p>
+<p>It comes with:</p>
+<ul>
+<li>A friendly DSL for defining tests</li>
+<li>Integration with QuickCheck and HUnit</li>
+<li>Full test coverage (self-hosting)</li>
+<li>Parallel test execution</li>
+<li>Automatic discovery of test files</li>
+</ul></article>
+ 
+</slide>
+
+<slide class="segue dark nobackground" >
+  
+    <aside class="gdbar"><img src="images/google_developers_icon_128.png"></aside>
+    <hgroup class="auto-fadein">
+      <h2>An overview of Hspec</h2>
+      <h3></h3>
+    </hgroup>
+  
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>An overview of Hspec</h2>
+      <h3></h3>
+    </hgroup>
+    <article ><pre data-lang="haskell">
+import Test.Hspec
+
+main :: IO ()
+main = hspec spec
+
+spec :: Spec
+spec = do
+  describe "reverse" $ do
+    it "reverses a list" $                    -- textual description
+      reverse [1, 2, 3] `shouldBe` [3, 2, 1]  -- example
+</pre></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>An overview of Hspec</h2>
+      <h3></h3>
+    </hgroup>
+    <article ><pre data-lang="haskell">
+import Test.Hspec
+
+main :: IO ()
+main = hspec spec
+
+spec :: Spec
+spec = do
+  describe "reverse" $ do
+    it "reverses a list" $                    -- textual description
+      reverse [1, 2, 3] `shouldBe` [3, 2, 1]  -- example
+</pre>
+
+<p>Examples can be</p>
+<ul>
+<li>HUnit assertions</li>
+<li>QuickCheck properties</li>
+<li>Hspec comes with it's own expectation language</li>
+</ul></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Running specs</h2>
+      <h3></h3>
+    </hgroup>
+    <article ><pre data-lang="ghci">
+Main*> :main
+
+reverse
+  - reverses a list
+
+Finished in 0.0006 seconds
+1 example, 0 failures
+</pre></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>QuickCheck properties as examples</h2>
+      <h3></h3>
+    </hgroup>
+    <article ><pre data-lang="haskell">
+import Test.Hspec
+import Test.QuickCheck
+
+main :: IO ()
+main = hspec spec
+
+spec :: Spec
+spec = do
+  describe "reverse" $ do
+    it "reverses a list" $
+      reverse [1, 2, 3] `shouldBe` [3, 2, 1]
+
+    it "gives the original list if applied twice" $
+      property $ \xs ->
+        (reverse . reverse) xs == (xs :: [Int])
+</pre></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Specs can be nested</h2>
+      <h3></h3>
+    </hgroup>
+    <article ><pre data-lang="haskell">
+spec :: Spec
+spec = do
+  describe "Prelude" $ do
+    describe "head" $
+      it "returns the first element of a list" $ do
+        head [23 ..] `shouldBe` (23 :: Int)
+
+      it "throws an exception when used with an empty list" $ do
+        evaluate (head []) `shouldThrow` anyException
+
+    describe "tail" $
+      ...
+</pre></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Use context</h2>
+      <h3></h3>
+    </hgroup>
+    <article ><pre data-lang="haskell">
+spec :: Spec
+spec = do
+  describe "Prelude" $ do
+    describe "head" $
+      it "returns the first element of a list" $ do
+        head [23 ..] `shouldBe` (23 :: Int)
+
+      context "when used with an empty list" $ do
+        it "throws an exception" $ do
+          evaluate (head []) `shouldThrow` anyException
+</pre>
+
+<ul>
+<li><code>context</code> is just an alias for <code>describe</code></li>
+<li>use <code>context</code> with <span class="blue">with</span> or <span class="blue">when</span></li>
+</ul></article>
+ 
+</slide>
+
+<slide class="segue dark nobackground" >
+  
+    <aside class="gdbar"><img src="images/google_developers_icon_128.png"></aside>
+    <hgroup class="auto-fadein">
+      <h2>Setting expectations</h2>
+      <h3></h3>
+    </hgroup>
+  
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Setting expectations</h2>
+      <h3></h3>
+    </hgroup>
+    <article ><h3>Expecting equality</h3>
+<pre data-lang="haskell">
+x `shouldBe` 23
+</pre>
+
+<h3>Expecting that a predicate holds</h3>
+<pre data-lang="haskell">
+x `shouldSatisfy` (< 23)
+</pre>
+
+<h3>Expectations and IO</h3>
+<pre data-lang="haskell">
+launchMissiles >>= (`shouldBe` Left "not implemented")
+</pre>
+
+<pre data-lang="haskell">
+launchMissiles `shouldReturn` Left "not implemented"
+</pre></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Expecting exceptions</h2>
+      <h3></h3>
+    </hgroup>
+    <article ><pre data-lang="ghci">*Main&gt; :t shouldThrow
+shouldThrow :: Exception e => IO a -> Selector e -> Expectation</pre>
+
+<pre data-lang="ghci">*Main&gt; :info Selector 
+type Selector a = a -> Bool</pre>
+
+<pre data-lang="haskell">
+launchMissiles `shouldThrow` (== ExitFailure 1)
+</pre></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Expecting exceptions</h2>
+      <h3></h3>
+    </hgroup>
+    <article ><pre data-lang="ghci">*Main&gt; :t shouldThrow
+shouldThrow :: Exception e => IO a -> Selector e -> Expectation</pre>
+
+<pre data-lang="ghci">*Main&gt; :info Selector 
+type Selector a = a -> Bool</pre>
+
+<pre data-lang="haskell">
+launchMissiles `shouldThrow` (== ExitFailure 1)
+</pre>
+
+<h3>It can be used with predicates from <code>System.IO.Error</code></h3>
+<pre data-lang="haskell">
+readFile "foo.txt" `shouldThrow` isDoesNotExistError
+</pre></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Predefined selectors</h2>
+      <h3></h3>
+    </hgroup>
+    <article ><pre data-lang="haskell">
+evaluate (1 `div` 0) `shouldThrow` anyArithException
+</pre>
+
+<pre data-lang="haskell">
+anyException :: Selector SomeException
+anyErrorCall :: Selector ErrorCall
+anyIOException :: Selector IOException
+anyArithException :: Selector ArithException
+</pre></article>
+ 
+</slide>
+
+<slide class="segue dark nobackground" >
+  
+    <aside class="gdbar"><img src="images/google_developers_icon_128.png"></aside>
+    <hgroup class="auto-fadein">
+      <h2>A brief introduction to QuickCheck</h2>
+      <h3>property based testing of Haskell functions</h3>
+    </hgroup>
+  
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>A brief introduction to QuickCheck</h2>
+      <h3></h3>
+    </hgroup>
+    <article ><pre data-lang="haskell">
+prop_foo :: Int -> Bool
+prop_foo x = x == x
+
+prop_bar :: [Int] -> Bool
+prop_bar xs = (reverse . reverse) xs == xs
+</pre>
+
+<pre data-lang="ghci">*Main&gt; quickCheck prop_foo
++++ OK, passed 100 tests.</pre></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>A brief introduction to QuickCheck</h2>
+      <h3></h3>
+    </hgroup>
+    <article ><pre data-lang="haskell">
+prop_foo :: Int -> Bool
+prop_foo x = x == x
+
+prop_bar :: [Int] -> Bool
+prop_bar xs = (reverse . reverse) xs == xs
+</pre>
+
+<pre data-lang="ghci">*Main&gt; quickCheck prop_foo
++++ OK, passed 100 tests.</pre>
+
+<pre data-lang="ghci">*Main&gt; quickCheck (\x -> x == 23)
+*** Failed! Falsifiable (after 1 test):  
+0</pre></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>A brief introduction to QuickCheck</h2>
+      <h3></h3>
+    </hgroup>
+    <article ><pre data-lang="haskell">
+prop_foo :: Int -> Bool
+prop_foo x = x == x
+
+prop_bar :: [Int] -> Bool
+prop_bar xs = (reverse . reverse) xs == xs
+</pre>
+
+<pre data-lang="ghci">*Main&gt; quickCheck prop_foo
++++ OK, passed 100 tests.</pre>
+
+<pre data-lang="ghci">*Main&gt; quickCheck (\x -> x == 23)
+*** Failed! Falsifiable (after 1 test):  
+0</pre>
+
+<pre data-lang="ghci">*Main&gt; quickCheck prop_bar 
++++ OK, passed 100 tests.</pre></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>The Arbitrary type class</h2>
+      <h3></h3>
+    </hgroup>
+    <article ><p>QuickCheck can generate random values for anything that is in the <code>Arbitrary</code>
+type class!</p>
+<pre data-lang="ghci">*Main&gt; :info Arbitrary
+class Arbitrary a where
+  arbitrary :: Gen a</pre></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>The Arbitrary type class</h2>
+      <h3></h3>
+    </hgroup>
+    <article ><p>QuickCheck can generate random values for anything that is in the <code>Arbitrary</code>
+type class!</p>
+<pre data-lang="ghci">*Main&gt; :info Arbitrary
+class Arbitrary a where
+  arbitrary :: Gen a</pre>
+
+<ul>
+<li>There are instance definitions for many standard types</li>
+<li>Defining new instances is easy by using combinators from
+   <code>Test.QuickCheck.Gen</code> or by reusing existing arbitrary instances</li>
+<li>There are <code>Monad</code>, <code>Applicative</code> and <code>Functor</code> instances for <code>Gen</code></li>
+</ul></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>The Arbitrary type class</h2>
+      <h3></h3>
+    </hgroup>
+    <article ><pre data-lang="haskell">
+import Test.QuickCheck
+import Control.Applicative
+
+data Person = Person {
+  firstName :: String,
+  lastName  :: String,
+  age       :: Int
+} deriving (Eq, Show)
+
+instance Arbitrary Person where
+  arbitrary = Person <$> arbitrary <*> arbitrary <*> arbitrary
+</pre></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>The Arbitrary type class</h2>
+      <h3></h3>
+    </hgroup>
+    <article ><pre data-lang="haskell">
+import Test.QuickCheck
+import Control.Applicative
+
+data Person = Person {
+  firstName :: String,
+  lastName  :: String,
+  age       :: Int
+} deriving (Eq, Show)
+
+instance Arbitrary Person where
+  arbitrary = Person <$> elements ["Joe", "John", "Jane"]
+                     <*> elements ["Doe", "Roe", "Smith"]
+                     <*> choose (18, 99)
+</pre></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>The Arbitrary type class</h2>
+      <h3></h3>
+    </hgroup>
+    <article ><pre data-lang="ghci">*Main&gt; sample (arbitrary :: Gen Person)
+Person {firstName = "John", lastName = "Doe", age = 94}
+Person {firstName = "Joe", lastName = "Roe", age = 65}
+Person {firstName = "Joe", lastName = "Smith", age = 76}
+Person {firstName = "John", lastName = "Doe", age = 29}
+Person {firstName = "John", lastName = "Smith", age = 24}
+Person {firstName = "Jane", lastName = "Smith", age = 20}
+Person {firstName = "John", lastName = "Doe", age = 96}
+Person {firstName = "Jane", lastName = "Smith", age = 77}
+Person {firstName = "Jane", lastName = "Doe", age = 91}
+Person {firstName = "Jane", lastName = "Roe", age = 93}
+Person {firstName = "Joe", lastName = "Doe", age = 96}</pre></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>The Arbitrary type class</h2>
+      <h3></h3>
+    </hgroup>
+    <article ><pre data-lang="haskell">
+savePerson :: Person -> IO Id
+savePerson = undefined
+
+loadPerson :: Id -> IO Person
+loadPerson = undefined
+
+spec :: Spec
+spec = do
+  describe "savePerson" $ do
+    it "saves a Person to the database" $ do
+      property $ \p -> do
+        (savePerson p >>= loadPerson) `shouldReturn` p
+</pre></article>
+ 
+</slide>
+
+<slide class="segue dark nobackground" >
+  
+    <aside class="gdbar"><img src="images/google_developers_icon_128.png"></aside>
+    <hgroup class="auto-fadein">
+      <h2>Extended example</h2>
+      <h3>calculating Fibonacci numbers</h3>
+    </hgroup>
+  
+</slide>
+
+<slide class="segue dark nobackground" >
+  
+    <aside class="gdbar"><img src="images/google_developers_icon_128.png"></aside>
+    <hgroup class="auto-fadein">
+      <h2>Automatic spec discovery</h2>
+      <h3></h3>
+    </hgroup>
+  
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2></h2>
+      <h3></h3>
+    </hgroup>
+    <article ><pre data-lang="shell">
+$ tree
+src/
+├── Foo.hs
+└── Bar.hs
+test/
+├── FooSpec.hs
+└── BarSpec.hs
+</pre>
+
+<pre data-lang="haskell">
+-- file test/Spec.hs
+import Test.Hspec
+
+import qualified FooSpec
+import qualified BarSpec
+
+main :: IO ()
+main = hspec $ do
+  describe "Foo" FooSpec.spec
+  describe "Bar" BarSpec.spec
+</pre></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2></h2>
+      <h3></h3>
+    </hgroup>
+    <article ><pre data-lang="shell">
+$ tree
+src/
+├── Foo.hs
+└── Bar.hs
+test/
+├── FooSpec.hs
+└── BarSpec.hs
+</pre>
+
+<pre data-lang="haskell">
+-- file test/Spec.hs
+{-# OPTIONS_GHC -F -pgmF hspec-discover #-}
+</pre>
+
+<h3>This is not a preprocessor!</h3></article>
+ 
+</slide>
+
+<slide class="segue dark nobackground" >
+  
+    <aside class="gdbar"><img src="images/google_developers_icon_128.png"></aside>
+    <hgroup class="auto-fadein">
+      <h2>Exercise</h2>
+      <h3>developing a JSON web service</h3>
+    </hgroup>
+  
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Developing a JSON web service</h2>
+      <h3></h3>
+    </hgroup>
+    <article ><p>Install <code>stack</code> according to the instructions from <a href="http://docs.haskellstack.org/en/stable/README.html#how-to-install">http://docs.haskellstack.org/en/stable/README.html#how-to-install</a></p>
+<pre data-lang="shell">
+$ git clone https://github.com/sol/hspec-tutorial
+</pre>
+
+<pre data-lang="shell">
+$ cd hspec-tutorial
+$ stack test
+</pre></article>
+ 
+</slide>
+
+
+<slide class="thank-you-slide dark segue nobackground">
+  <aside class="gdbar right"><img src="images/google_developers_icon_128.png"></aside>
+  <article class="flexbox vleft auto-fadein">
+    <h2>Thank You!</h2>
+  </article>
+  <p class="auto-fadein" data-config-contact>
+    <!-- populated from slide_config.json -->
+  </p>
+</slide>
+
+<!-- <slide class="logoslide dark nobackground">
+  <article class="flexbox vcenter">
+    <span><img src="images/google_developers_logo_white.png"></span>
+  </article>
+</slide> -->
+
+<slide class="backdrop"></slide>
+
+</slides>
+
+<script>
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-XXXXXXXX-1']);
+_gaq.push(['_trackPageview']);
+
+(function() {
+  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();
+</script>
+
+<!--[if IE]>
+  <script src="http://ajax.googleapis.com/ajax/libs/chrome-frame/1/CFInstall.min.js"></script>
+  <script>CFInstall.check({mode: 'overlay'});</script>
+<![endif]-->
+</body>
+</html>
